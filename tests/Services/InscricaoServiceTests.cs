@@ -115,6 +115,42 @@ namespace Cgs.TechCursos.Tests.Services
         }
 
         [Fact]
+        public void GetAll_Should_ReturnInscricoes_When_ThereAreInscricoes()
+        {
+            // Arrange
+           
+            var inscricoes = new List<Inscricao>
+            {
+                new Inscricao(Guid.NewGuid(), Guid.NewGuid(), InscricaoStatus.Pendente),
+                new Inscricao(Guid.NewGuid(), Guid.NewGuid(), InscricaoStatus.Pendente)
+            };
+
+            _inscricaoRepositoryMock.Setup(repo => repo.GetAll()).Returns(inscricoes);
+
+            // Act
+            var result = _inscricaoService.GetAll();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(inscricoes.Count, result.Count());
+            Assert.Contains(result, i => inscricoes.Any(e => e.Id == i.Id));
+        }
+
+        [Fact]
+        public void GetAll_Should_ReturnEmptyList_When_NoInscricoes()
+        {
+            // Arrange
+            _inscricaoRepositoryMock.Setup(repo => repo.GetAll()).Returns(new List<Inscricao>());
+
+            // Act
+            var result = _inscricaoService.GetAll();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        [Fact]
         public void GetById_ShouldAddNotification_WhenIdIsEmpty()
         {
             // Act

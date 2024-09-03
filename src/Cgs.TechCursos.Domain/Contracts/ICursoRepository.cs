@@ -7,8 +7,8 @@ namespace Cgs.TechCursos.Domain.Contracts
 {
     public interface ICursoRepository
     {
-        void Add(Curso professor);
-        void Update(Curso professor);
+        void Add(Curso curso);
+        void Update(Curso curso);
         Curso GetById(Guid id);
         IEnumerable<Curso> GetAll();
         void Delete(Guid id);

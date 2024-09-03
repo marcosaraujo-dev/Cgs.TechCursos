@@ -1,18 +1,18 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Cgs.TechCursos.Domain.Entities
 {
-    public class Professor
+    public class Professor: Pessoa
     {
-        public Guid Id { get; private set; }
-        public string Nome { get; private set; }
-        public string Email { get; private set; }
-
-        public Professor(string nome, string email)
+      public string Disciplina { get; set; }
+        public Professor(string nome, string email, string documento, string disciplina)
         {
             Id = Guid.NewGuid();
             Nome = nome;
             Email = email;
+            Documento = documento;
+            Disciplina = disciplina;
         }
     }
 }

@@ -20,8 +20,10 @@ namespace Cgs.TechCursos.Infrastructure.Repositories
             var existeAluno = GetById(aluno.Id);
             if (existeAluno != null)
             {
-                existeAluno = aluno;
+                _alunos.Remove(existeAluno);
+                _alunos.Add(aluno);
             }
+
         }
 
         public Aluno GetById(Guid id)

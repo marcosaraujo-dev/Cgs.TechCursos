@@ -20,7 +20,8 @@ namespace Cgs.TechCursos.Infrastructure.Repositories
             var existeProfessor = GetById(professor.Id);
             if (existeProfessor != null)
             {
-                existeProfessor = professor;
+                _professores.Remove(existeProfessor); 
+                _professores.Add(professor);          
             }
         }
 

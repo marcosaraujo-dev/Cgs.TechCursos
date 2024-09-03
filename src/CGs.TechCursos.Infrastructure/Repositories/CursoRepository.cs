@@ -10,17 +10,18 @@ namespace Cgs.TechCursos.Infrastructure.Repositories
     {
         private readonly List<Curso> _cursos = new List<Curso>();
 
-        public void Add(Curso Curso)
+        public void Add(Curso curso)
         {
-            _cursos.Add(Curso);
+            _cursos.Add(curso);
         }
 
-        public void Update(Curso Curso)
+        public void Update(Curso curso)
         {
-            var existeCurso = GetById(Curso.Id);
+            var existeCurso = GetById(curso.Id);
             if (existeCurso != null)
             {
-                existeCurso = Curso;
+                _cursos.Remove(existeCurso); // Remove o professor existente
+                _cursos.Add(curso);
             }
         }
 

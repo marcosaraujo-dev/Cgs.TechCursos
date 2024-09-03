@@ -1,5 +1,6 @@
 ﻿using Cgs.TechCursos.Domain.Entities;
 using FluentValidation;
+using System;
 
 namespace Cgs.TechCursos.Domain.Validators
 {
@@ -7,13 +8,11 @@ namespace Cgs.TechCursos.Domain.Validators
     {
         public AlunoValidator()
         {
-            RuleFor(professor => professor.Nome)
-                .NotEmpty().WithMessage("O nome não pode ser vazio")
-                .Length(2, 100).WithMessage("O nome deve ter entre 3 e 100 caracteres");
+            Include(new PessoaValidator<Aluno>());
 
-            RuleFor(professor => professor.Email)
-                .NotEmpty().WithMessage("Email não pode ser vazio")
-                .EmailAddress().WithMessage("O email deve estar em um formato válido");
+            RuleFor(a => a.DataNascimento)
+                .NotEmpty().WithMessage("A data de nascimento é obrigatória.")
+                .LessThan(DateTime.Now).WithMessage("A data de nascimento deve ser no passado.");
         }
     }
 }

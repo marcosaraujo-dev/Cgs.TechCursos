@@ -61,6 +61,12 @@ namespace Cgs.TechCursos.Application.Services
 
         public Aluno Get(Guid id)
         {
+            if (id == Guid.Empty)
+            {
+                AddNotification(nameof(id), "O Id do aluno é inválido.");
+                return null;
+            }
+
             var student = _alunoRepository.GetById(id);
             if (student == null)
                 AddNotification("Aluno", "Aluno não localizado");

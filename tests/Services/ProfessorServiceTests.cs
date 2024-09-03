@@ -5,6 +5,8 @@ using Cgs.TechCursos.Application.Services;
 using Cgs.TechCursos.Domain.Contracts;
 using Cgs.TechCursos.Domain.Entities;
 using System.Collections.Generic;
+using FluentAssertions;
+using Cgs.TechCursos.Domain.Validators;
 
 
 namespace Cgs.TechCursos.Tests.Services
@@ -24,7 +26,7 @@ namespace Cgs.TechCursos.Tests.Services
         public void Create_Should_AddProfessor_When_ProfessorIsValid()
         {
             // Arrange
-            var professor = new Professor("Marcos Araujo", "marcos.araujo@cgs.com");
+            var professor = new Professor("Marcos Araujo", "marcos.araujo@cgs.com", "12345678910", "Lógica");
 
             // Act
             _professorService.Create(professor);
@@ -50,10 +52,10 @@ namespace Cgs.TechCursos.Tests.Services
         public void Create_Should_AddNotification_When_EmailAlreadyExists()
         {
             // Arrange
-            var existingProfessor = new Professor("Marcos Araujo", "marcos.araujo@cgs.com");
+            var existingProfessor = new Professor("Marcos Araujo", "marcos.araujo@cgs.com", "12345678910", "Lógica");
             _professorRepositoryMock.Setup(repo => repo.GetAll()).Returns(new List<Professor> { existingProfessor });
 
-            var newProfessor = new Professor("Marcos Araujo", "marcos.araujo@cgs.com");
+            var newProfessor = new Professor("Marcos Araujo", "marcos.araujo@cgs.com", "12345678910", "Lógica");
 
             // Act
             _professorService.Create(newProfessor);
@@ -68,18 +70,66 @@ namespace Cgs.TechCursos.Tests.Services
         public void Create_Should_AddNotification_When_ProfessorIsInvalid()
         {
             // Arrange
-            var professor = new Professor("", "email_invalido"); // Professor inválido (nome vazio, email inválido)
+            var professor = new Professor("", "email_invalido", "", ""); // Professor inválido (nome vazio, email inválido)
 
             // Act
             _professorService.Create(professor);
 
             // Assert
             Assert.False(_professorService.IsValid);
-            Assert.Contains(_professorService.Notifications, n => n.Property == "Nome" && n.Message == "O nome não pode ser vazio");
-            Assert.Contains(_professorService.Notifications, n => n.Property == "Nome" && n.Message == "O nome deve ter entre 3 e 100 caracteres");
-            Assert.Contains(_professorService.Notifications, n => n.Property == "Email" && n.Message == "O email deve estar em um formato válido");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Nome" && n.Message == "O nome não pode ser vazio.");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Nome" && n.Message == "O nome deve ter entre 3 e 100 caracteres.");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Email" && n.Message == "O e-mail deve ser válido.");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Documento" && n.Message == "O documento é obrigatório.");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Documento" && n.Message == "O documento deve ter 11 ou 14 caracteres.");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Disciplina" && n.Message == "A disciplina é obrigatória.");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Disciplina" && n.Message == "A disciplina deve ter entre 2 e 100 caracteres.");
             _professorRepositoryMock.Verify(repo => repo.Add(It.IsAny<Professor>()), Times.Never);
         }
+
+        [Fact]
+        public void Update_Should_UpdateProfessor_When_ProfessorIsValid()
+        {
+            // Arrange
+            var professor = new Professor("Marcos Araujo", "marcos.araujo@cgs.com", "12345678910", "Lógica");
+            var id = Guid.NewGuid();
+            typeof(Professor).GetProperty(nameof(Professor.Id)).SetValue(professor, id);
+
+            _professorRepositoryMock.Setup(repo => repo.GetById(id)).Returns(professor);
+
+            // Act
+            _professorService.Update(professor);
+
+            // Assert
+            Assert.True(_professorService.IsValid);
+            _professorRepositoryMock.Verify(repo => repo.Update(professor), Times.Once);
+        }
+
+        [Fact]
+        public void Update_Should_AddNotification_When_ProfessorIsInvalid()
+        {
+            // Arrange
+            var professor = new Professor("", "email_invalido", "", "");
+            var id = Guid.NewGuid();
+            typeof(Professor).GetProperty(nameof(Professor.Id)).SetValue(professor, id);
+
+            _professorRepositoryMock.Setup(repo => repo.GetById(id)).Returns(professor);
+
+            // Act
+            _professorService.Update(professor);
+
+            // Assert
+            Assert.False(_professorService.IsValid);
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Nome" && n.Message == "O nome não pode ser vazio.");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Nome" && n.Message == "O nome deve ter entre 3 e 100 caracteres.");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Email" && n.Message == "O e-mail deve ser válido.");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Documento" && n.Message == "O documento é obrigatório.");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Documento" && n.Message == "O documento deve ter 11 ou 14 caracteres.");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Disciplina" && n.Message == "A disciplina é obrigatória.");
+            Assert.Contains(_professorService.Notifications, n => n.Property == "Disciplina" && n.Message == "A disciplina deve ter entre 2 e 100 caracteres.");
+            _professorRepositoryMock.Verify(repo => repo.Update(It.IsAny<Professor>()), Times.Never);
+        }
+
 
         [Fact]
         public void Update_Should_AddNotification_When_ProfessorIsNull()
@@ -97,7 +147,7 @@ namespace Cgs.TechCursos.Tests.Services
         public void Update_Should_AddNotification_When_ProfessorNotFound()
         {
             // Arrange
-            var professor = new Professor("Marcos Araujo", "marcos.araujo@cgs.com");
+            var professor = new Professor("Marcos Araujo", "marcos.araujo@cgs.com", "12345678910", "Lógica");
             var id = Guid.NewGuid();
             typeof(Professor).GetProperty(nameof(Professor.Id)).SetValue(professor, id);
 
@@ -112,23 +162,7 @@ namespace Cgs.TechCursos.Tests.Services
             _professorRepositoryMock.Verify(repo => repo.Update(It.IsAny<Professor>()), Times.Never);
         }
 
-        [Fact]
-        public void Update_Should_UpdateProfessor_When_ProfessorIsValid()
-        {
-            // Arrange
-            var professor = new Professor("Marcos Araujo", "marcos.araujo@cgs.com");
-            var id = Guid.NewGuid();
-            typeof(Professor).GetProperty(nameof(Professor.Id)).SetValue(professor, id);
-
-            _professorRepositoryMock.Setup(repo => repo.GetById(id)).Returns(professor);
-
-            // Act
-            _professorService.Update(professor);
-
-            // Assert
-            Assert.True(_professorService.IsValid);
-            _professorRepositoryMock.Verify(repo => repo.Update(professor), Times.Once);
-        }
+       
 
         [Fact]
         public void GetById_Should_AddNotification_When_IdIsEmpty()
@@ -156,6 +190,33 @@ namespace Cgs.TechCursos.Tests.Services
             Assert.False(_professorService.IsValid);
             Assert.Contains(_professorService.Notifications, n => n.Property == "Professor" && n.Message == "Professor não localizado.");
             Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetById_Should_AddNotification_When_IdIsValidButProfessorDoesNotExist()
+        {
+            // Arrange
+            var professorId = Guid.NewGuid();
+
+            _professorRepositoryMock.Setup(repo => repo.GetById(professorId)).Returns((Professor)null);
+
+            // Act
+            var result = _professorService.GetById(professorId);
+
+            // Assert
+            result.Should().BeNull();
+            _professorService.Notifications.Should().ContainSingle(n => n.Property == "Professor" && n.Message == "Professor não localizado.");
+        }
+
+        [Fact]
+        public void GetById_Should_AddNotification_When_IdIsInvalid()
+        {
+            // Act
+            var result = _professorService.GetById(Guid.Empty);
+
+            // Assert
+            result.Should().BeNull();
+            _professorService.Notifications.Should().ContainSingle(n => n.Property == "id" && n.Message == "O Id do professor é inválido.");
         }
 
         [Fact]
@@ -191,7 +252,7 @@ namespace Cgs.TechCursos.Tests.Services
         {
             // Arrange
             var id = Guid.NewGuid();
-            var professor = new Professor("Marcos Araujo", "marcos.araujo@cgs.com");
+            var professor = new Professor("Marcos Araujo", "marcos.araujo@cgs.com", "12345678910", "Lógica");
             typeof(Professor).GetProperty(nameof(Professor.Id)).SetValue(professor, id);
 
             _professorRepositoryMock.Setup(repo => repo.GetById(id)).Returns(professor);

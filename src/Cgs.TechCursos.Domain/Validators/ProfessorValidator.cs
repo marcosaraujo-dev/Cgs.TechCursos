@@ -7,13 +7,11 @@ namespace Cgs.TechCursos.Domain.Validators
     {
         public ProfessorValidator()
         {
-            RuleFor(professor => professor.Nome)
-                .NotEmpty().WithMessage("O nome não pode ser vazio")
-                .Length(2, 100).WithMessage("O nome deve ter entre 3 e 100 caracteres");
+            Include(new PessoaValidator<Professor>());
 
-            RuleFor(professor => professor.Email)
-                .NotEmpty().WithMessage("Email não pode ser vazio")
-                .EmailAddress().WithMessage("O email deve estar em um formato válido");
+            RuleFor(p => p.Disciplina)
+                .NotEmpty().WithMessage("A disciplina é obrigatória.")
+                .Length(2, 100).WithMessage("A disciplina deve ter entre 2 e 100 caracteres.");
         }
     }
 }

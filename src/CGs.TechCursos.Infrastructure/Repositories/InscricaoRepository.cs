@@ -10,17 +10,18 @@ namespace Cgs.TechCursos.Infrastructure.Repositories
     {
         private readonly List<Inscricao> _inscricoes = new List<Inscricao>();
 
-        public void Add(Inscricao Inscricao)
+        public void Add(Inscricao inscricao)
         {
-            _inscricoes.Add(Inscricao);
+            _inscricoes.Add(inscricao);
         }
 
-        public void Update(Inscricao Inscricao)
+        public void Update(Inscricao inscricao)
         {
-            var existeInscricao = GetById(Inscricao.Id);
+            var existeInscricao = GetById(inscricao.Id);
             if (existeInscricao != null)
             {        
-                existeInscricao = Inscricao;
+               _inscricoes.Remove(existeInscricao);
+                _inscricoes.Add(inscricao);
             }
         }
 

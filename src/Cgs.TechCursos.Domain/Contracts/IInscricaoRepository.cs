@@ -7,8 +7,8 @@ namespace Cgs.TechCursos.Domain.Contracts
 {
     public interface IInscricaoRepository
     {
-        void Add(Inscricao professor);
-        void Update(Inscricao professor);
+        void Add(Inscricao inscricao);
+        void Update(Inscricao inscricao);
         Inscricao GetById(Guid id);
         IEnumerable<Inscricao> GetAll();
 
